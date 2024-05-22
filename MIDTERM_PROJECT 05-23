@@ -1,0 +1,269 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <cctype>
+
+using namespace std;
+
+struct ticket {
+	int num;
+	ticket* next;
+};
+
+ticket* front = NULL;
+ticket* rear = NULL;
+
+void menu() {
+	cout << "HJT Western Banking Cooperation" << endl;
+	cout << "1. Get a Ticket" << endl;
+	cout << "2. Process client and perform banking operations" << endl;
+	cout << "3. Display Queue" << endl;
+	cout << "4. Exit" << endl;
+}
+
+void intValidation(int& num) {
+	while (true) {
+		if (cin >> num) {
+			break;
+		}
+		else {
+			cout << "Input must be a number, try again: ";
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	}
+}
+
+void charValidation(char& choice) {
+	while (true) {
+		cin >> choice;
+		if (!isalpha(choice)) {
+			cout << "Choice should be a letter, please try again: ";
+		}
+		else {
+			break;
+		}
+	}
+}
+
+// Function to validate string input
+void strValidation(string& input) {
+	bool validation;
+
+	while (true) {
+		getline(cin, input);
+		for (char c : input) {
+			if (!(isalpha(c) || isspace(c))) {
+				validation = false;
+				break;
+			}
+			else {
+				validation = true;
+			}
+		}
+		if (!validation) {
+			cout << "Input must be a string, try again: ";
+		}
+		else {
+			break;
+		}
+	}
+}
+
+// Function to validate user input (yes/no)
+void userValidation(string& input) {
+	strValidation(input);
+	while (true) {
+		if (!(input == "yes" || tolower(input == "YES") || tolower(input == "Yes") || input == "no" || tolower(input == "NO") || tolower(input == "No")) || input == "") {
+			cout << "Invalid, type only either \"yes\" or \"no\": ";
+		}
+		else {
+			break;
+		}
+	}
+}
+
+void get_ticket(int& ticket_counter);
+void delete_ticket();
+void deposit(int& amount, int& total_amount);
+void withdrawal(int& amount, int& total_amount);
+void check_balance(int& num);
+void banking_operations(int& amount, int& total_amount);
+void displayQueue();
+void exit(bool& termination);
+
+int main() {
+	int amount = 0, total_amount = 0, ticket_counter = 0, choice;
+	bool termination = false;
+
+	do {
+		menu();
+		cout << "Enter your choice: ";
+		while (true) {
+			intValidation(choice);
+			if (choice < 1 || choice > 4) {
+				cout << "Choice should be either from 1 - 4, try again: ";
+			}
+			else {
+				break;
+			}
+		}
+
+		system("cls");
+
+		switch (choice) {
+		case 1:
+			get_ticket(amount);
+			break;
+		case 2:
+			banking_operations(amount, total_amount);
+			break;
+		case 3:
+			displayQueue();
+			break;
+		case 4:
+			exit(termination);
+			break;
+		}
+	} while (!termination);
+
+	return 0;
+}
+
+void get_ticket(int& ticket_counter) {
+	ticket_counter++;
+	ticket* temp = new ticket;
+	temp->num = ticket_counter;
+	temp->next = NULL;
+
+	if (front == NULL) {
+		front = temp;
+		rear = temp;
+		cout << "\nTicket number " << temp->num << " has been issued..." << endl;
+		return;
+	}
+	rear->next = temp;
+	rear = temp;
+	cout << "\nTicket number " << temp->num << " has been issued..." << endl;
+}
+
+void delete_ticket() {
+	ticket* temp;
+	temp = front;
+	if (front != NULL) {
+		front = front->next;
+		delete(temp);
+	}
+}
+
+void deposit(int& amount, int& total_amount) {
+	cout << "  -->Enter amount to deposit: ";
+	cin >> amount;
+
+	cout << "\n  Deposited: " << amount << endl;
+	total_amount += amount;
+	cout << "  Current Balance: " << total_amount << endl;
+
+	cout << "\n";
+	system("pause");
+}
+
+void withdrawal(int& amount, int& total_amount) {
+	cout << "  -->Enter amount to withdraw: ";
+	cin >> amount;
+	if (amount > total_amount) {
+		cout << "\n  Insufficient balance. Please try again..." << endl;
+	}
+	else {
+		cout << "\n  Withdrew: " << amount << endl;
+		total_amount -= amount;
+		cout << "  Current Balance: " << total_amount << endl;
+	}
+	cout << "\n";
+	system("pause");
+}
+
+void check_balance(int& num) {
+	cout << "\n  Your current balance: " << num << endl;
+	cout << "\n";
+	system("pause");
+}
+
+void banking_operations(int& amount, int& total_amount) {
+	char choice;
+	ticket* p;
+
+	if (front == NULL) {
+		cout << "\n  Queue is empty...Please get a ticket..." << endl;
+	}
+	else {
+		do {
+			p = front;
+			system("cls");
+			cout << "\nProcessing client with ticket number " << p->num << endl;
+
+			cout << "Operations:" << endl;
+			cout << "[D] Deposit" << endl;
+			cout << "[W] Withrawal" << endl;
+			cout << "[C] Check Balance" << endl;
+			cout << "[E] End Transaction" << endl;
+
+			cout << "\n  -->Enter your choice (D, W, C, E): ";
+			while (true) {
+				charValidation(choice);
+				if (!(choice == 'd' || choice == 'D' || choice == 'w' || choice == 'W' || choice == 'c' || choice == 'C' || choice == 'e' || choice == 'E')) {
+					cout << "Choice must be either \'D\', \'W\', \'C\', or \'E\', please try again: ";
+				}
+				else {
+					break;
+				}
+			}
+
+			system("cls");
+
+			switch (choice) {
+			case 'd': case 'D':
+				deposit(amount, total_amount);
+				break;
+			case 'w': case 'W':
+				withdrawal(amount, total_amount);
+				break;
+			case 'c': case 'C':
+				check_balance(total_amount);
+				break;
+			case 'e': case 'E':
+				delete_ticket();
+				break;
+			}
+		} while (!(choice == 'e' || choice == 'E'));
+	}
+}
+
+void displayQueue() {
+	ticket* temp;
+	if (front == NULL) {
+		cout << "\n  Queue is empty..." << endl;
+	}
+	else {
+		cout << "\nTicket number in queue" << endl;
+		temp = front;
+		while (temp != NULL) {
+			cout << temp->num << endl;
+			temp = temp->next;
+		}
+	}
+}
+
+void exit(bool& termination) {
+	string exitOption;
+
+	cout << "Are you sure do you want to exit the program: ";
+	userValidation(exitOption);
+
+	system("cls");
+
+	if (exitOption == "yes" || tolower(exitOption == "YES") || tolower(exitOption == "Yes")) {
+		termination = true;
+		cout << "Program has been sucessfully terminated." << endl;
+	}
+}
