@@ -1,0 +1,17 @@
+void display()
+{
+    node *p;
+    if (front==NULL)
+        cout << "Nothing to display\n";
+    else{
+        cout << "Clients in queue with ticket number: ";
+        p = front;
+        while (p != NULL) {
+            cout << " | " << p->data << " | ";
+            p=p->next;
+        }
+    }
+}
+
+//ayusin ko nalang pag tapos ng ibang parts
+//kinuha ko lang sa gawa ni sir e
